@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DOROOD-GEMINI: Infinity 47</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #1e1e1e;
+            --text-color: #f0f0f0;
+            --accent-color: #00bcd4; /* فیروزه‌ای */
+            --premium-color: #ff9800; /* نارنجی */
+            --fun-color: #8bc34a; /* سبز لیمویی */
+            --header-bg: linear-gradient(135deg, #0097a7 0%, #00bcd4 100%);
+            --input-bg: #2d2d2d;
+            --border-color: #444;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --font-family: 'Tahoma', 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 0;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--header-bg);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            padding-right: 10px;
+        }
+        
+        /* این کلاس لوگو دیگر استفاده نمی‌شود مگر اینکه عکس را اضافه کنید */
+        .logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        /* --- Tab Styles --- */
+        .category-tabs, .sub-tabs {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 5px;
+            border-bottom: 1px solid var(--border-color);
+            scrollbar-width: none; /* Firefox */
+        }
+        .category-tabs::-webkit-scrollbar, .sub-tabs::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .category-btn, .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .category-btn.active, .tab-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .category-btn:hover, .tab-btn:hover {
+            background-color: #333;
+        }
+
+        .content {
+            padding: 20px;
+        }
+        
+        /* --- Form Elements and Utility --- */
+        input[type="text"], input[type="password"], input[type="number"], input[type="url"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #008c9e;
+        }
+
+        .result-box {
+            background: var(--input-bg);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        #login-screen {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .login-input {
+            margin-bottom: 20px;
+        }
+        
+        /* سایر استایل‌ها بدون تغییر باقی می‌مانند */
+    </style>
+
+    <script>
+        // تعریف متغیرهای اصلی
+        let isLoggedIn = false;
+        let activeCategory = 'core';
+        const CATEGORY_MAP = {
+            core: ['calc', 'shop', 'date', 'unit', 'htmlref'],
+            premium: ['vault', 'habit', 'code', 'dictionary', 'passgen', 'textstat', 'tipcalc', 'httpref', 'binaryconv', 'matrix', 'regex', 'imgsearch', 'imgvault', 
+                'musicsearch', 'tageditor', 'bpmfinder', 'linkconverter', 'mediaconverter', 'websearch', 'bookmark',
+                'editstudio', 'ai_chat', 'stt_tool', 'tts_tool', 'market_watch', 'ai_image_gen', 'ai_video_gen', 'daily_articles', 'ai_advisor', 'ai_widgets',
+                'nanobanana_img', 'sora_veo_vid' 
+            ],
+            fun: ['story', 'dictation', 'color', 'colorpicker', 'random', 'timemachine', 'cooking', 'puzzlegame']
+        };
+
+        // --- توابع کمکی ---
+        function showResult(elementId, text, isError = false) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.innerHTML = text;
+            // تنظیم رنگ بردر باکس نتیجه بر اساس نوع تب
+            el.style.borderColor = isError ? 'var(--error-color)' : (elementId.includes('premium') || elementId.includes('vault') || elementId.includes('code') || elementId.includes('bookmark')) ? 'var(--premium-color)' : (elementId.includes('fun') || elementId.includes('cooking') || elementId.includes('puzzlegame')) ? 'var(--fun-color)' : 'var(--accent-color)';
+        }
+
+        // --- تابع حیاتی: مدیریت تب‌ها ---
+        function changeCategory(category, event) {
+            activeCategory = category;
+            const categories = ['core', 'premium', 'fun'];
+            
+            // حذف کلاس active از دکمه‌های دسته بندی
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            if (event) event.currentTarget.classList.add('active');
+            
+            categories.forEach(cat => {
+                const catEl = document.getElementById(`category-${cat}`);
+                if (cat === category) {
+                    catEl.classList.remove('hidden');
+                    // اگر ورود الزامی است (Premium/Fun)
+                    if ((cat === 'premium' || cat === 'fun') && !isLoggedIn) {
+                        document.getElementById('lock-screen').classList.remove('hidden');
+                        document.getElementById(`category-${cat}`).querySelector('.sub-tabs').classList.add('hidden');
+                        document.getElementById(`category-${cat}`).querySelector(`#${cat}-content`).classList.add('hidden');
+                        return;
+                    } else {
+                        document.getElementById('lock-screen').classList.add('hidden');
+                        // مطمئن شوید که زیرتب‌ها و محتوا فعال شوند
+                        const subTabsEl = document.getElementById(`${cat}-tabs`);
+                        const contentEl = document.getElementById(`${cat}-content`);
+                        if (subTabsEl) subTabsEl.classList.remove('hidden');
+                        if (contentEl) contentEl.classList.remove('hidden');
+                    }
+                    
+                    // نمایش اولین تب آن دسته
+                    const firstTab = CATEGORY_MAP[category][0];
+                    const firstTabEl = document.querySelector(`#${category}-tabs .tab-btn`);
+                    if (firstTabEl) {
+                        // پاکسازی کلاس فعال از بقیه زیرتب‌ها
+                        document.querySelectorAll(`#${category}-tabs .tab-btn`).forEach(btn => btn.classList.remove('active'));
+                        firstTabEl.classList.add('active');
+                        showTab(firstTab, null, category);
+                    }
+                } else {
+                    catEl.classList.add('hidden');
+                }
+            });
+        }
+        
+        // --- تابع حیاتی: تغییر زیرتب ---
+        function showTab(name, event, category) {
+            // حذف کلاس فعال از همه زیرتب‌ها
+            document.querySelectorAll(`#${category}-tabs .tab-btn`).forEach(btn => btn.classList.remove('active'));
+            
+            // مخفی کردن محتوای تمام تب‌ها در آن دسته
+            CATEGORY_MAP[category].forEach(tabName => {
+                const tabContentEl = document.getElementById(`tab-${tabName}`);
+                if (tabContentEl) tabContentEl.classList.add('hidden');
+            });
+
+            // نمایش محتوای تب فعلی
+            const contentEl = document.getElementById(`tab-${name}`);
+            if (contentEl) contentEl.classList.remove('hidden');
+
+            // فعال کردن دکمه تب
+            if (event) event.currentTarget.classList.add('active');
+        }
+
+        // --- تابع حیاتی: ماشین‌حساب ---
+        // تعریف شبیه‌سازی math (برای ماشین حساب)
+        const math = {
+            eval: (expression) => {
+                try {
+                    // شبیه‌سازی eval برای امنیت و سادگی
+                    const result = new Function('return ' + expression)();
+                    return isNaN(result) ? "Error: عبارت نامعتبر" : result;
+                } catch (e) {
+                    return "Error: عبارت نامعتبر";
+                }
+            },
+        };
+
+        function calculate() {
+            const expression = document.getElementById('calc-input').value;
+            const result = math.eval(expression);
+            showResult('calc-output', `نتیجه: ${result}`, typeof result === 'string' && result.includes('Error'));
+        }
+        
+        // --- تابع حیاتی: ورود/خروج ---
+        function checkLoginStatus() {
+            const storedId = localStorage.getItem('dorood_login_id');
+            const storedPass = localStorage.getItem('dorood_login_password');
+            const loginScreen = document.getElementById('login-screen');
+            const mainApp = document.getElementById('main-app');
+            
+            if (storedId && storedPass) {
+                isLoggedIn = true;
+                loginScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                // بلافاصله پس از ورود، روی تب اصلی بمان
+                // مطمئن شویم که changeCategory را با یک دکمه فعال call نمی‌کنیم
+                setTimeout(() => changeCategory('core', null), 0); 
+            } else {
+                isLoggedIn = false;
+                loginScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+            }
+        }
+        
+        function attemptLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            if (!id || !password) {
+                document.getElementById('login-error').innerText = 'شناسه و رمز عبور نمی‌توانند خالی باشند.';
+                return;
+            }
+            // شبیه‌سازی ورود موفق با ذخیره در حافظه مرورگر
+            localStorage.setItem('dorood_login_id', id);
+            localStorage.setItem('dorood_login_password', password);
+            checkLoginStatus(); 
+        }
+        
+        function logout() {
+            localStorage.removeItem('dorood_login_id');
+            localStorage.removeItem('dorood_login_password');
+            checkLoginStatus();
+        }
+
+        // --- توابع قابلیت‌های جانبی (Mockup) ---
+        function showPremiumContentMockup(tabName, event) {
+             showTab(tabName, event, 'premium');
+             const outputId = `tab-${tabName}`;
+             let message = "";
+             if (tabName === 'vault') message = "🔐 صندوقچه امن: قابلیت ذخیره اطلاعات رمزگذاری شده را شبیه‌سازی می‌کند.";
+             else if (tabName === 'ai_chat') message = "🤖 چت هوش مصنوعی: نیاز به اتصال به API Gemini دارد. خروجی در این شبیه‌سازی، یک پیام متنی خواهد بود.";
+             // ... بقیه mockup ها ...
+             else message = `محتوای تب ${tabName} آماده نمایش است.`;
+             
+             // برای این تب‌ها محتوای آزمایشی قرار داده نشده، بنابراین اینجا فقط یک پیام نمایش می‌دهیم:
+             const contentEl = document.getElementById(outputId);
+             if(contentEl && contentEl.innerHTML.trim() === '...') {
+                 contentEl.innerHTML = `<h2 style="color: var(--premium-color);">🛠️ ${tabName}</h2><p>${message}</p>`;
+             }
+        }
+        
+        function showFunContentMockup(tabName, event) {
+             showTab(tabName, event, 'fun');
+             // ... بقیه mockup ها ...
+        }
+
+        // تابع نهایی: اجرای اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus(); 
+        });
+    </script>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="login-screen">
+        <h1 style="color: var(--accent-color); margin-bottom: 30px;">ورود به ابزارهای پیشرفته</h1>
+        <p style="color: #aaa;">برای دسترسی به ابزارهای پیشرفته، شماره تلفن/ایمیل و رمز عبور (Master Key) را وارد کنید.</p>
+        
+        <input type="text" id="login-id" class="login-input" placeholder="شماره/ایمیل">
+        <input type="password" id="login-password" class="login-input" placeholder="رمز عبور اصلی (Master Key)">
+        
+        <button class="action-btn" style="background: var(--premium-color);" onclick="attemptLogin()">ورود</button>
+        <p id="login-error" style="color: var(--error-color); margin-top: 15px;"></p>
+        
+        <p style="margin-top: 40px; color: #777; font-size: 0.8rem;">*راهنما: برای ورود آزمایشی، شناسه و رمز عبور را یک رشته دلخواه و یکسان وارد کنید.</p>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <div class="header">
+            <h1>DOROOD-GEMINI: Infinity 47</h1>
+            <button onclick="logout()" style="position: absolute; top: 10px; left: 10px; background: none; color: white; border: none; font-size: 0.8rem; cursor: pointer; opacity: 0.7;">خروج</button>
+        </div>
+
+        <div class="category-tabs">
+            <button class="category-btn active" data-category="core" onclick="changeCategory('core', event)">ابزارهای اصلی</button>
+            <button class="category-btn" data-category="premium" onclick="changeCategory('premium', event)" style="color: var(--premium-color);">ابزارهای پیشرفته</button>
+            <button class="category-btn" data-category="fun" onclick="changeCategory('fun', event)" style="color: var(--fun-color);">سرگرمی</button>
+        </div>
+
+        <div class="content">
+            <div id="lock-screen" class="hidden">
+                <h2 style="color: var(--premium-color);">🔐 دسترسی محدود شده است</h2>
+                <p>برای استفاده از این بخش، ابتدا از صفحه ورود (Login Screen) وارد شوید.</p>
+                <button class="action-btn" style="background: var(--premium-color); margin-top: 20px;" onclick="checkLoginStatus()">ورود مجدد</button>
+            </div>
+
+            <div id="category-core">
+                <div class="sub-tabs" id="core-tabs">
+                    <button class="tab-btn active" onclick="showTab('calc', event, 'core')">ماشین‌حساب</button>
+                    <button class="tab-btn" onclick="showTab('shop', event, 'core')">لیست خرید</button>
+                    <button class="tab-btn" onclick="showTab('date', event, 'core')">تبدیل تاریخ</button>
+                    <button class="tab-btn" onclick="showTab('unit', event, 'core')">تبدیل واحد</button>
+                    <button class="tab-btn" onclick="showTab('htmlref', event, 'core')">نماد HTML</button>
+                </div>
+                <div id="core-content">
+                    <div id="tab-calc">
+                        <div style="background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent-color);">
+                            <p style="font-weight: bold; color: var(--accent-color); margin: 0;">🛠️ مدل: DOROOD-GEMINI: Infinity 47</p>
+                            <p style="font-size: 0.85rem; color: #ddd; margin: 5px 0 0 0;">این جدیدترین مدل برنامه، ساخت دست **DOROOD** است و با استفاده از هوش مصنوعی **Gemini** تقویت شده است.</p>
+                        </div>
+                        <h2 style="color: var(--accent-color);">ماشین‌حساب (Calculator)</h2>
+                        <input type="text" id="calc-input" placeholder="عبارت ریاضی (مثلاً: 5 + 3 * 2)" value="">
+                        <button class="action-btn" onclick="calculate()">محاسبه</button>
+                        <div class="result-box" id="calc-output">نتیجه</div>
+                    </div>
+                    <div id="tab-shop" class="hidden">
+                        <h2 style="color: var(--fun-color);">🛒 لیست خرید</h2>
+                        <p>این بخش برای اضافه کردن آیتم‌ها به لیست خرید شما طراحی شده است.</p>
+                        <input type="text" placeholder="نام آیتم">
+                        <button class="action-btn" style="background: var(--fun-color);">اضافه کردن</button>
+                    </div>
+                    <div id="tab-date" class="hidden">
+                        <h2 style="color: var(--accent-color);">📅 تبدیل تاریخ شمسی/میلادی</h2>
+                        <input type="text" placeholder="تاریخ شمسی یا میلادی (مثلاً: 1403/08/30)">
+                        <button class="action-btn">تبدیل</button>
+                    </div>
+                    <div id="tab-unit" class="hidden">
+                        <h2 style="color: var(--accent-color);">📏 تبدیل واحد (طول، وزن، دما)</h2>
+                        <input type="number" placeholder="مقدار">
+                        <select>
+                            <option>کیلومتر به مایل</option>
+                            <option>کیلوگرم به پوند</option>
+                        </select>
+                        <button class="action-btn">تبدیل</button>
+                    </div>
+                    <div id="tab-htmlref" class="hidden">
+                        <h2 style="color: var(--accent-color);">📚 نمادهای HTML</h2>
+                        <p>این بخش یک مرجع سریع برای نمادهای خاص HTML است.</p>
+                        <input type="text" placeholder="جستجوی نماد">
+                        <div class="result-box">نتیجه جستجو</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="category-premium" class="hidden">
+                <div class="sub-tabs" id="premium-tabs">
+                    <button class="tab-btn active" onclick="showPremiumContentMockup('vault', event)">صندوقچه امن</button>
+                    <button class="tab-btn" onclick="showPremiumContentMockup('ai_chat', event)">چت AI</button>
+                    <button class="tab-btn" onclick="showPremiumContentMockup('market_watch', event)">رصد بازار</button>
+                    </div>
+                <div id="premium-content">
+                    <div id="tab-vault">...</div>
+                    <div id="tab-habit" class="hidden">...</div>
+                    <div id="tab-code" class="hidden">...</div>
+                    <div id="tab-dictionary" class="hidden">...</div>
+                    <div id="tab-passgen" class="hidden">
